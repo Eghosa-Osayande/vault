@@ -64,7 +64,32 @@ class VaultConfigTests(unittest.TestCase):
         self.assertEqual(config.repo_root, Path(temp_dir).resolve())
         self.assertEqual(config.vault_path, Path(temp_dir).resolve() / "vault")
 
+    def test_from_env_loads_values_from_dotenv(self) -> None:
+        with tempfile.TemporaryDirectory() as temp_dir:
+            repo_root = Path(temp_dir)
+            (repo_root / ".env").write_text(
+                "\n".join(
+                    [
+                        f"VAULT_REPO_ROOT={repo_root}",
+                        "VAULT_PATH=vault",
+                        "BACKUP_DIRECTORY=backups",
+                        "ARCHIVE_PREFIX=vault-backup",
+                    ]
+                )
+                + "\n",
+                encoding="utf-8",
+            )
+            previous = os.getcwd()
+            os.chdir(temp_dir)
+            try:
+                config = VaultConfig.from_env()
+            finally:
+                os.chdir(previous)
+
+        self.assertEqual(config.repo_root, repo_root.resolve())
+        self.assertEqual(config.vault_path, repo_root.resolve() / "vault")
+        self.assertEqual(config.backup_directory, repo_root.resolve() / "backups")
+
 
 if __name__ == "__main__":
     unittest.main()
-

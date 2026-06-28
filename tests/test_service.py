@@ -109,7 +109,7 @@ class VaultServiceIntegrationTests(unittest.TestCase):
 
 class NotebookArtifactTests(unittest.TestCase):
     def test_notebook_is_valid_json(self) -> None:
-        notebook_path = Path(__file__).resolve().parents[1] / "notebooks" / "vault_demo.ipynb"
+        notebook_path = Path(__file__).resolve().parents[1] / "notebooks" / "vault.ipynb"
         data = json.loads(notebook_path.read_text(encoding="utf-8"))
         self.assertIn("cells", data)
         self.assertGreater(len(data["cells"]), 0)

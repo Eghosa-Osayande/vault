@@ -31,7 +31,7 @@ Open `vault/` in Obsidian or copy an existing vault into it. `.obsidian/` is inc
 
 The Python implementation now lives in `src/vaultlib/` and is the shared library intended for notebook, future CLI, and future GUI layers.
 
-Configuration is environment-variable based in this pass:
+Configuration is environment-variable based in this pass, and `VaultConfig.from_env()` will also load the same values from a local `.env` file when present.
 
 ```bash
 export VAULT_REPO_ROOT="$PWD"
@@ -41,6 +41,15 @@ export ARCHIVE_PREFIX="vault-backup"
 python3 -m venv .venv
 source .venv/bin/activate
 pip install -r requirements.txt
+```
+
+Equivalent `.env` file:
+
+```dotenv
+VAULT_REPO_ROOT=/absolute/path/to/your/repo
+VAULT_PATH=vault
+BACKUP_DIRECTORY=backups
+ARCHIVE_PREFIX=vault-backup
 ```
 
 Library usage:
@@ -59,7 +68,7 @@ service.restore_backup(Path(backup.archive_path), SecretValue("correct horse bat
 
 ## Notebook Demo
 
-The notebook demo lives at `notebooks/vault_demo.ipynb`. It uses `ipywidgets` for passphrase entry, archive selection, overwrite confirmation, and status output while calling `vaultlib` directly for all operations.
+The notebook demo lives at `notebooks/vault.ipynb`. It uses `ipywidgets` for passphrase entry, archive selection, overwrite confirmation, and status output while calling `vaultlib` directly for all operations.
 
 ## Legacy Shell Commands
 

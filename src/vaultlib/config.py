@@ -5,6 +5,8 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Mapping
 
+from dotenv import dotenv_values
+
 from .exceptions import ConfigError
 
 
@@ -53,6 +55,8 @@ class VaultConfig:
     @classmethod
     def from_env(cls, env: Mapping[str, str] | None = None) -> "VaultConfig":
         env_map = dict(os.environ if env is None else env)
+        if env is None:
+            env_map = cls._load_dotenv_defaults(env_map)
         repo_root_raw = env_map.get("VAULT_REPO_ROOT", os.getcwd())
         repo_root = Path(repo_root_raw).expanduser().resolve()
 
@@ -97,3 +101,24 @@ class VaultConfig:
             archive_prefix=archive_prefix,
         )
 
+    @staticmethod
+    def _load_dotenv_defaults(env_map: Mapping[str, str]) -> dict[str, str]:
+        merged = dict(env_map)
+        cwd = Path.cwd()
+        candidate_paths = [cwd / ".env"]
+
+        repo_root_raw = merged.get("VAULT_REPO_ROOT")
+        if repo_root_raw:
+            candidate_paths.insert(0, Path(repo_root_raw).expanduser() / ".env")
+
+        for dotenv_path in candidate_paths:
+            if not dotenv_path.is_file():
+                continue
+            values = dotenv_values(dotenv_path)
+            for key in ("VAULT_REPO_ROOT", "VAULT_PATH", "BACKUP_DIRECTORY", "ARCHIVE_PREFIX"):
+                value = values.get(key)
+                if value is not None and key not in merged:
+                    merged[key] = value
+            break
+
+        return merged
