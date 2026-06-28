@@ -56,6 +56,12 @@ Run:
 ./scripts/backup.sh
 ```
 
+or:
+
+```bash
+make backup
+```
+
 `age` will prompt for the passphrase and confirmation during encryption, then prompt again during verification before the final `.tar.gz.age` file is renamed into place.
 
 ## Listing
@@ -66,12 +72,24 @@ Run:
 ./scripts/list.sh
 ```
 
+or:
+
+```bash
+make list
+```
+
 ## Verification
 
 Verify the newest completed backup:
 
 ```bash
 ./scripts/verify.sh
+```
+
+or:
+
+```bash
+make verify
 ```
 
 Verify a selected artifact:
@@ -88,6 +106,12 @@ Verify a selected artifact:
 
 ```bash
 ./scripts/restore.sh
+```
+
+or:
+
+```bash
+make restore
 ```
 
 4. Enter the same passphrase used to create the backup.
