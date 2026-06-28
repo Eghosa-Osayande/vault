@@ -32,7 +32,11 @@ mkdir -p vault
 
 Open `vault/` in Obsidian or copy an existing vault into it. `.obsidian/` is included in backups.
 
-## Commands
+## Python Library
+
+The Python implementation now lives in `src/vaultlib/` and is the shared library intended for notebook, future CLI, and future GUI layers.
+
+Configuration is environment-variable based in this pass, and `VaultConfig.from_env()` will also load the same values from a local `.env` file when present.
 
 ```bash
 make backup
@@ -42,7 +46,16 @@ make restore
 make commit
 ```
 
-Useful options:
+Equivalent `.env` file:
+
+```dotenv
+VAULT_REPO_ROOT=/absolute/path/to/your/repo
+VAULT_PATH=vault
+BACKUP_DIRECTORY=backups
+ARCHIVE_PREFIX=vault-backup
+```
+
+Library usage:
 
 ```bash
 make verify ARCHIVE='backups/vault-backup-2026-06-28T15-30-00Z.tar.gz.age'
@@ -52,7 +65,13 @@ make restore ARCHIVE='backups/vault-backup-2026-06-28T15-30-00Z.tar.gz.age' REPL
 make commit MESSAGE='Add encrypted vault backup'
 ```
 
-`make backup` will prompt for the passphrase once for encryption and again for verification. `make commit` stages `backups/` and creates a Git commit. `make restore REPLACE_EXISTING=1` moves the current vault to `vault.recovery-...` before placing the restored snapshot.
+## Notebook Demo
+
+The notebook demo lives at `notebooks/vault.ipynb`. It uses `ipywidgets` for passphrase entry, archive selection, overwrite confirmation, and status output while calling `vaultlib` directly for all operations.
+
+## Legacy Shell Commands
+
+The original shell scripts are still present in `scripts/` during this migration, but the Python library is the canonical implementation for new interfaces.
 
 ## Typical flow
 
