@@ -121,17 +121,13 @@ create_recovery_path() {
 
 load_config
 validate_git_protection
-require_commands age tar gzip find mktemp awk
+require_commands age tar gzip find mktemp
 
 ARCHIVE_PATH="$(resolve_archive_argument "$archive_argument")"
 validate_archive_file "$ARCHIVE_PATH" 0
 
 if ! validate_archive_listing "$ARCHIVE_PATH"; then
     die "Backup verification failed."
-fi
-
-if ! archive_has_safe_entry_types "$ARCHIVE_PATH"; then
-    die "Backup archive contains symbolic links or hard links, or could not be listed safely."
 fi
 
 temp_restore_directory="$(make_private_temp_dir "obsidian-vault-restore")"

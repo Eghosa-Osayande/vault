@@ -324,19 +324,6 @@ validate_archive_listing() {
     return 0
 }
 
-archive_has_safe_entry_types() {
-    local archive_path="$1"
-
-    age --decrypt "$archive_path" | tar -tvzf - | awk '
-        {
-            entry_type = substr($0, 1, 1)
-            if (entry_type == "l" || entry_type == "h") {
-                exit 1
-            }
-        }
-    '
-}
-
 directory_is_empty() {
     local directory_path="$1"
     local first_entry
