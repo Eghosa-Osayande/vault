@@ -1,0 +1,7 @@
+vault/
+vault.recovery-*
+
+backups/*.partial
+backups/*.tmp
+
+.DS_Store
