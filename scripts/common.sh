@@ -220,49 +220,8 @@ archive_has_valid_extension() {
     esac
 }
 
-validate_archive_filename() {
-    local archive_filename="$1"
-
-    [ -n "$archive_filename" ] || die "Archive filename must not be empty."
-
-    case "$archive_filename" in
-        */*|*' '*|*$'\t'*|*\"*|*\'*|*$'\n'*|*$'\r'*)
-            die "Archive filename must be a simple filename."
-            ;;
-        *.partial)
-            die "Archive filename must not end with .partial."
-            ;;
-    esac
-
-    archive_has_valid_extension "$archive_filename" 0 || die "Invalid archive filename: $archive_filename"
-    printf '%s\n' "$archive_filename"
-}
-
 archive_is_within_backup_directory() {
     path_is_within "$BACKUP_DIRECTORY_ABS" "$1"
-}
-
-prompt_for_confirmation() {
-    local prompt_message="$1"
-    local response
-
-    [ -t 0 ] || die "Confirmation required, but no interactive terminal is available."
-
-    while :; do
-        printf '%s [y/N] ' "$prompt_message" > /dev/tty
-        read -r response < /dev/tty || return 1
-
-        case "$response" in
-            [Yy]|[Yy][Ee][Ss])
-                return 0
-                ;;
-            ""|[Nn]|[Nn][Oo])
-                return 1
-                ;;
-        esac
-
-        printf 'Please answer yes or no.\n' > /dev/tty
-    done
 }
 
 resolve_archive_argument() {
@@ -452,42 +411,6 @@ safe_remove_backup_temp_file() {
             return 1
             ;;
     esac
-
-    rm -f -- "$target_path"
-}
-
-safe_remove_backup_file() {
-    local target_path="$1"
-
-    [ -n "$target_path" ] || return 0
-
-    case "$target_path" in
-        "/"|"")
-            error "Refusing to remove an unsafe backup path."
-            return 1
-            ;;
-    esac
-
-    [ "$target_path" != "$REPO_ROOT" ] || {
-        error "Refusing to remove the repository root."
-        return 1
-    }
-
-    archive_is_within_backup_directory "$target_path" || {
-        error "Refusing to remove a file outside the backup directory: $target_path"
-        return 1
-    }
-
-    archive_has_valid_extension "$target_path" 0 || return 1
-    [ -L "$target_path" ] && {
-        error "Refusing to remove a symbolic link backup path: $target_path"
-        return 1
-    }
-    [ -e "$target_path" ] || return 0
-    [ -f "$target_path" ] || {
-        error "Refusing to remove a non-regular backup path: $target_path"
-        return 1
-    }
 
     rm -f -- "$target_path"
 }
